@@ -177,49 +177,6 @@
 }
 
 
-.flex-h {
-	flex-direction: row;
-	display: flex
-}
-.flex-h.a-center {
-	align-items: center
-}
-.flex-h.gap-tiny {
-	grid-column-gap: .5rem
-}
-.flex-h.a-top {
-	align-items: flex-start;
-	margin-bottom: -3px
-}
-.flex-h.a-top.is-contact {
-	grid-column-gap: 6.5625em
-}
-.flex-h.a-top.gap-filter {
-	grid-column-gap: .25rem
-}
-.flex-h.gap-med {
-	grid-column-gap: 2rem
-}
-.flex-h.j-between {
-	justify-content: space-between
-}
-.flex-h.a-btm {
-	align-items: flex-end
-}
-.flex-h.gap-large {
-	grid-column-gap: 4em;
-	grid-row-gap: 4em
-}
-.flex-h.gap-xlarge {
-	grid-column-gap: 5em;
-	grid-row-gap: 5em
-}
-.flex-h.j-split {
-	justify-content: space-between;
-	width: 100%
-}
-
-
 @media screen and (max-width:991px) {
 	.project-thumb__video {
 		display: none
