@@ -1,0 +1,254 @@
+.section {
+    z-index: 1;
+    background-color: var(--white);
+    position: relative
+}
+.section.text-black {
+    color: var(--black)
+}
+.section.is--contact {
+    background-color: var(--black);
+    height: 100vh
+}
+.section.is--footer_top {
+    z-index: 100;
+    background-color: var(--black);
+    height: 4rem
+}
+.section.is--work_top {
+    padding-top: 2.75rem
+}
+.section.is--home__hero {
+    z-index: -2
+}
+.section.is-about__hero {
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    min-height: 100vh;
+    display: flex
+}
+
+
+.main-c {
+    width: 100%;
+    max-width: 160rem;
+    margin-left: auto;
+    margin-right: auto
+}
+.main-c.pad-small {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem
+}
+.main-c.pad-small.pad-vertical {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem
+}
+.main-c.pad-small.pad-bottom {
+    padding-bottom: 1.25rem
+}
+
+
+.project-list__wrapper {
+	width: 100%;
+	padding: .625rem
+}
+
+
+.project-w {
+	width: 100%
+}
+
+.project-list {
+	flex-flow: row;
+	grid-template-rows: auto;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-auto-columns: 1fr;
+	width: 100%;
+	display: flex
+}
+
+
+.project-item {
+	flex: 1;
+	max-width: 50%;
+	padding: .625rem;
+	transition: max-width .6s cubic-bezier(.77, 0, .175, 1), flex .6s cubic-bezier(.77, 0, .175, 1);
+	display: flex;
+	position: relative
+}
+.project-item:hover {
+	flex-grow: 3.15;
+	flex-basis: auto;
+	max-width: 66.7%
+}
+
+
+.project-item__media-w {
+	border-radius: .625rem;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 60vh;
+	min-height: 31rem;
+	display: flex;
+	position: relative;
+	overflow: hidden
+}
+
+.project-item__media {
+	object-fit: cover;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	min-height: 105%;
+	display: flex;
+	position: absolute;
+	top: 0
+}
+
+
+.project-item__media.is--thumb {
+	display: none
+}
+
+
+.w-inline-block {
+	max-width: 100%;
+	display: inline-block
+}
+
+
+.w-embed:before, .w-embed:after {
+	content: " ";
+	grid-area: 1/1/2/2;
+	display: table
+}
+.w-embed:after {
+	clear: both
+}
+
+
+.item-overlay {
+	z-index: 1;
+	background-color: var(--black);
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0%;
+	bottom: 0%;
+	left: 0%;
+	right: 0%
+}
+
+
+.project-item__gradient {
+	opacity: 0;
+	transform-origin: 0%;
+	transform-style: preserve-3d;
+	background-image: linear-gradient(90deg, rgba(0, 0, 0, .5), transparent);
+	width: 33%;
+	min-width: 25em;
+	height: 100%;
+	transition: opacity .6s cubic-bezier(.77, 0, .175, 1), transform .6s cubic-bezier(.77, 0, .175, 1);
+	position: absolute;
+	top: 0%;
+	bottom: 0%;
+	left: 0%;
+	right: auto;
+	transform: scaleX(0)
+}
+
+.project-item__info-w {
+	z-index: 2;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+	padding-bottom: 1rem;
+	display: flex;
+	position: absolute;
+	left: 1.875rem;
+	right: auto
+}
+
+.project-item__info-w.is--segment {
+	left: 1.25rem
+}
+
+
+.flex-h {
+	flex-direction: row;
+	display: flex
+}
+.flex-h.a-center {
+	align-items: center
+}
+.flex-h.gap-tiny {
+	grid-column-gap: .5rem
+}
+.flex-h.a-top {
+	align-items: flex-start;
+	margin-bottom: -3px
+}
+.flex-h.a-top.is-contact {
+	grid-column-gap: 6.5625em
+}
+.flex-h.a-top.gap-filter {
+	grid-column-gap: .25rem
+}
+.flex-h.gap-med {
+	grid-column-gap: 2rem
+}
+.flex-h.j-between {
+	justify-content: space-between
+}
+.flex-h.a-btm {
+	align-items: flex-end
+}
+.flex-h.gap-large {
+	grid-column-gap: 4em;
+	grid-row-gap: 4em
+}
+.flex-h.gap-xlarge {
+	grid-column-gap: 5em;
+	grid-row-gap: 5em
+}
+.flex-h.j-split {
+	justify-content: space-between;
+	width: 100%
+}
+
+
+@media screen and (max-width:991px) {
+	.project-thumb__video {
+		display: none
+	}
+
+	.project-item__media.is--thumb {
+		display: block
+	}
+}
+
+
+@media screen and (max-width:767px) {
+	.project-item, .project-list__wrapper {
+		padding: .375rem
+	}
+
+	.project-item__info-w.pointer-off {
+		padding-bottom: .75rem;
+		left: 1.25rem
+	}
+}
+
+@media screen and (max-width:479px) {
+    .project-item__media-w {
+		height: 30rem;
+		min-height: auto
+	}
+
+	.project-item__info-w {
+		white-space: normal
+	}
+}
