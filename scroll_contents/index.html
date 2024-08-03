@@ -81,26 +81,33 @@
       document.addEventListener('DOMContentLoaded', function () {
         const videoSection = document.querySelector('.video-section');
         const elements = document.querySelectorAll('.target_contents p');
-        const video = document.querySelector('#scrolly-video video');
+        let lastScrollTop = 0;
 
         function checkScroll() {
-            const scrollPercentage = (window.scrollY / (videoSection.offsetHeight - window.innerHeight)) * 100;
-            const videoTime = (scrollPercentage / 100) * video.duration;
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const scrollPercentage = (scrollTop / (videoSection.offsetHeight - window.innerHeight)) * 100;
 
-            elements.forEach((elem, index) => {
-            if (index < 2 && videoTime >= 1) {
+          const scrollingDown = scrollTop > lastScrollTop;
+
+          elements.forEach((elem, index) => {
+            const threshold = index * 33;
+            if (scrollingDown) {
+              if (scrollPercentage > threshold) {
                 elem.classList.add('is_showed');
-            } else if (index === 2 && videoTime >= 6) {
-                elem.classList.add('is_showed');
+              }
             } else {
+              if (scrollPercentage <= threshold) {
                 elem.classList.remove('is_showed');
+              }
             }
-            });
+          });
+
+          lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // For Mobile or negative scrolling
         }
 
         window.addEventListener('scroll', checkScroll);
-        checkScroll();
-        });
+        checkScroll(); // 初期表示時にもチェック
+      });
     </script>
   </body>
 </html>
