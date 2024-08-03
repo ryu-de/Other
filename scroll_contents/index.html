@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>スクロールに応じて動画・テキスト表出</title>
+    <style>
+      body, html, * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .video-section {
+        height: 300vh;
+        position: relative;
+      }
+
+      #scrolly-video {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        width: 100%;
+      }
+
+      .text-section {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 300vh;
+        pointer-events: none;
+      }
+
+      .target_contents {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .target_contents p {
+        font-size: 2rem;
+        color: #fff;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s, transform 0.5s;
+        margin-bottom: 1em;
+      }
+
+      .target_contents p.is_showed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="video-section">
+        <div id="scrolly-video"></div>
+        <div class="text-section">
+          <div class="target_contents">
+            <p class="cnt_first">first text</p>
+            <p class="cnt_second">second text second text second text second text<br />second text second</p>
+            <p class="cnt_third">third text third text third text third text third text third text third text third text</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
+    <script>
+      new ScrollyVideo({
+        scrollyVideoContainer: 'scrolly-video',
+        src: 'assets/movie/movie.mp4',
+      });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const videoSection = document.querySelector('.video-section');
+        const elements = document.querySelectorAll('.target_contents p');
+        const video = document.querySelector('#scrolly-video video');
+
+        function checkScroll() {
+            const scrollPercentage = (window.scrollY / (videoSection.offsetHeight - window.innerHeight)) * 100;
+            const videoTime = (scrollPercentage / 100) * video.duration;
+
+            elements.forEach((elem, index) => {
+            if (index < 2 && videoTime >= 1) {
+                elem.classList.add('is_showed');
+            } else if (index === 2 && videoTime >= 6) {
+                elem.classList.add('is_showed');
+            } else {
+                elem.classList.remove('is_showed');
+            }
+            });
+        }
+
+        window.addEventListener('scroll', checkScroll);
+        checkScroll();
+        });
+    </script>
+  </body>
+</html>
