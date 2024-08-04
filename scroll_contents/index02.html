@@ -58,10 +58,6 @@
     </style>
   </head>
   <body>
-    <section class="outer">
-        <p>スクロールビデオ外のコンテンツ<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-        </p>
-    </section>
     <main>
       <section class="video-section">
         <div id="scrolly-video"></div>
@@ -74,10 +70,6 @@
         </div>
       </section>
     </main>
-    <section class="outer">
-        <p>スクロールビデオ外のコンテンツ<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-        </p>
-    </section>
 
     <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
     <script>
@@ -94,6 +86,7 @@
         const sectionHeight = videoSection.offsetHeight;
         const windowHeight = window.innerHeight;
         const scrollSteps = 3; // セクションを3つに分割
+        const stepSize = sectionHeight / scrollSteps;
 
         function setScrollPosition(position) {
           window.scrollTo({
@@ -125,34 +118,74 @@
         }
 
         function handleScroll(event) {
-          if (isScrolling) return;
-          isScrolling = true;
+          if (isScrolling) {
+            event.preventDefault();
+            return;
+          }
 
           const delta = event.wheelDelta || -event.deltaY || -event.detail;
           const direction = delta > 0 ? -1 : 1;
           const currentScrollPosition = window.pageYOffset;
-          const stepSize = sectionHeight / scrollSteps;
 
           let targetPosition;
           if (direction > 0) {
-            targetPosition = Math.ceil(currentScrollPosition / stepSize) * stepSize;
+            targetPosition = Math.ceil((currentScrollPosition + 1) / stepSize) * stepSize;
           } else {
-            targetPosition = Math.floor(currentScrollPosition / stepSize) * stepSize;
+            targetPosition = Math.floor((currentScrollPosition - 1) / stepSize) * stepSize;
           }
 
           targetPosition = Math.max(0, Math.min(targetPosition, sectionHeight - windowHeight));
 
-          setScrollPosition(targetPosition);
+          if (targetPosition !== currentScrollPosition) {
+            isScrolling = true;
+            setScrollPosition(targetPosition);
+            setTimeout(() => {
+              isScrolling = false;
+              checkScroll();
+            }, 1000);
+            event.preventDefault();
+          }
+        }
 
-          setTimeout(() => {
-            isScrolling = false;
-            checkScroll();
-          }, 1000); // スクロールアニメーションの時間に合わせて調整
+        let touchStartY = 0;
+        function handleTouchStart(event) {
+          touchStartY = event.touches[0].clientY;
+        }
 
-          event.preventDefault();
+        function handleTouchMove(event) {
+          if (isScrolling) {
+            event.preventDefault();
+            return;
+          }
+
+          const touchEndY = event.touches[0].clientY;
+          const delta = touchEndY - touchStartY;
+          const direction = delta > 0 ? -1 : 1;
+          const currentScrollPosition = window.pageYOffset;
+
+          let targetPosition;
+          if (direction > 0) {
+            targetPosition = Math.ceil((currentScrollPosition + 1) / stepSize) * stepSize;
+          } else {
+            targetPosition = Math.floor((currentScrollPosition - 1) / stepSize) * stepSize;
+          }
+
+          targetPosition = Math.max(0, Math.min(targetPosition, sectionHeight - windowHeight));
+
+          if (Math.abs(delta) > 50 && targetPosition !== currentScrollPosition) {
+            isScrolling = true;
+            setScrollPosition(targetPosition);
+            setTimeout(() => {
+              isScrolling = false;
+              checkScroll();
+            }, 1000);
+            event.preventDefault();
+          }
         }
 
         window.addEventListener('wheel', handleScroll, { passive: false });
+        window.addEventListener('touchstart', handleTouchStart, { passive: false });
+        window.addEventListener('touchmove', handleTouchMove, { passive: false });
         window.addEventListener('scroll', checkScroll);
         checkScroll(); // 初期表示時にもチェック
       });
