@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>スクロールに応じて動画・テキスト表出</title>
+    <title>スクロールジャック付き動画・テキスト表示</title>
     <style>
       body, html, * {
         margin: 0;
@@ -58,6 +58,10 @@
     </style>
   </head>
   <body>
+    <section class="outer">
+        <p>スクロールビデオ外のコンテンツ<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </p>
+    </section>
     <main>
       <section class="video-section">
         <div id="scrolly-video"></div>
@@ -70,6 +74,10 @@
         </div>
       </section>
     </main>
+    <section class="outer">
+        <p>スクロールビデオ外のコンテンツ<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </p>
+    </section>
 
     <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
     <script>
@@ -82,10 +90,21 @@
         const videoSection = document.querySelector('.video-section');
         const elements = document.querySelectorAll('.target_contents p');
         let lastScrollTop = 0;
+        let isScrolling = false;
+        const sectionHeight = videoSection.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const scrollSteps = 3; // セクションを3つに分割
+
+        function setScrollPosition(position) {
+          window.scrollTo({
+            top: position,
+            behavior: 'smooth'
+          });
+        }
 
         function checkScroll() {
           const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const scrollPercentage = (scrollTop / (videoSection.offsetHeight - window.innerHeight)) * 100;
+          const scrollPercentage = (scrollTop / (sectionHeight - windowHeight)) * 100;
 
           const scrollingDown = scrollTop > lastScrollTop;
 
@@ -105,6 +124,35 @@
           lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
         }
 
+        function handleScroll(event) {
+          if (isScrolling) return;
+          isScrolling = true;
+
+          const delta = event.wheelDelta || -event.deltaY || -event.detail;
+          const direction = delta > 0 ? -1 : 1;
+          const currentScrollPosition = window.pageYOffset;
+          const stepSize = sectionHeight / scrollSteps;
+
+          let targetPosition;
+          if (direction > 0) {
+            targetPosition = Math.ceil(currentScrollPosition / stepSize) * stepSize;
+          } else {
+            targetPosition = Math.floor(currentScrollPosition / stepSize) * stepSize;
+          }
+
+          targetPosition = Math.max(0, Math.min(targetPosition, sectionHeight - windowHeight));
+
+          setScrollPosition(targetPosition);
+
+          setTimeout(() => {
+            isScrolling = false;
+            checkScroll();
+          }, 1000); // スクロールアニメーションの時間に合わせて調整
+
+          event.preventDefault();
+        }
+
+        window.addEventListener('wheel', handleScroll, { passive: false });
         window.addEventListener('scroll', checkScroll);
         checkScroll(); // 初期表示時にもチェック
       });
