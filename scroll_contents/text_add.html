@@ -15,7 +15,7 @@
         position: relative;
       }
 
-      #scrolly-video {
+      #scrolly-video, #scrolly-video02 {
         position: sticky;
         top: 0;
         height: 100vh;
@@ -56,12 +56,12 @@
         transform: translateY(0);
       }
 
-      /* 仕様2と3のための新しいスタイル */
       .cnt_forth, .cnt_fifth {
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
         opacity: 0;
+        transition: opacity 0.5s;
       }
 
       .cnt_forth {
@@ -74,33 +74,44 @@
 
       .cnt_forth.is_showed, .cnt_fifth.is_showed {
         opacity: 1;
-        transition: opacity 0.5s;
-        animation-name: textanime;/*keyname*/
-        animation-duration:5s;/*最大再生時間*/
       }
 
-        @keyframes textanime {
-        0%{
-            opacity: 0;
-        }
 
-        100%{
-            opacity: 1;
-        }
-        }
+      /* 2つ目のセクション用のスタイル */
+      .video-section02 {
+        margin-top: 3vh;
+      }
+      .video-section02 {
+        height: 300vh;
+        position: relative;
+      }
+
+      #scrolly-video02 {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        width: 100%;
+      }
     </style>
   </head>
   <body>
     <main>
       <section class="video-section">
         <div id="scrolly-video"></div>
-        <div id="scrolly-video02"></div>
         <div class="text-section">
           <div class="target_contents">
             <p class="cnt_first">first text</p>
-            <!-- <p class="cnt_second">second text second text second text second text<br />second text second</p>
-            <p class="cnt_third">third text third text third text third text third text third text third text third text</p> -->
+            <p class="cnt_second">second text second text second text second text<br />second text second</p>
+            <p class="cnt_third">third text third text third text third text third text third text third text third text</p>
+          </div>
+        </div>
+      </section>
 
+      <section class="video-section video-section02">
+        <div id="scrolly-video02"></div>
+        <div class="text-section">
+          <div class="target_contents">
+            <p class="cnt_title">title</p>
             <p class="cnt_forth">ぱっと1</p>
             <p class="cnt_fifth">ぱっと2</p>
           </div>
@@ -110,76 +121,80 @@
 
     <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
     <script>
-        let scrollyVideo;
-
         document.addEventListener('DOMContentLoaded', function () {
-            scrollyVideo = new ScrollyVideo({
-                scrollyVideoContainer: 'scrolly-video',
-                src: 'assets/movie/movie.mp4',
-            });
+        let scrollyVideo, scrollyVideo02;
 
-            scrollyVideo02 = new ScrollyVideo({
-                scrollyVideoContainer: 'scrolly-video02',
-                src: 'assets/movie/movie02.mp4',  // 2つ目の動画のパスを指定
-            });
+        scrollyVideo = new ScrollyVideo({
+            scrollyVideoContainer: 'scrolly-video',
+            src: 'assets/movie/movie.mp4',
+        });
 
-            const videoSection = document.querySelector('.video-section');
-            const elements = document.querySelectorAll('.target_contents p');
-            let lastScrollTop = 0;
+        scrollyVideo02 = new ScrollyVideo({
+            scrollyVideoContainer: 'scrolly-video02',
+            src: 'assets/movie/movie.mp4',
+        });
 
-            function checkScroll() {
+        const videoSection = document.querySelector('.video-section');
+        const videoSection02 = document.querySelector('.video-section02');
+        const elements = document.querySelectorAll('.video-section .target_contents p');
+        const elements02 = document.querySelectorAll('.video-section02 .target_contents p');
+
+        function checkScroll() {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const scrollPercentage = (scrollTop / (videoSection.offsetHeight - window.innerHeight)) * 100;
+            const windowHeight = window.innerHeight;
 
-            const scrollingDown = scrollTop > lastScrollTop;
-
-            // 動画の現在時間を取得
-            const currentTime = scrollyVideo.video.currentTime;
+            // 1つ目のビデオセクションのスクロール処理
+            const videoSectionRect = videoSection.getBoundingClientRect();
+            const scrollPercentage = (windowHeight - videoSectionRect.top) / (videoSectionRect.height + windowHeight) * 100;
 
             elements.forEach((elem, index) => {
-                const threshold = index * 33;
+            const threshold = index * 33;
 
-                // 仕様1: 4秒地点で最初の3つのテキストを消す
-                if (currentTime >= 4 && (elem.classList.contains('cnt_first') ||
-                    elem.classList.contains('cnt_second') ||
-                    elem.classList.contains('cnt_third'))) {
-                elem.classList.remove('is_showed');
-                return;
-                }
-
-                // 仕様2: cnt_forthを4秒地点で表示
-                if (elem.classList.contains('cnt_forth')) {
-                if (currentTime >= 4 && currentTime < 9) {
-                    elem.classList.add('is_showed');
-                } else {
-                    elem.classList.remove('is_showed');
-                }
-                return;
-                }
-
-                // 仕様3: cnt_fifthを9秒地点で表示
-                if (elem.classList.contains('cnt_fifth') && currentTime >= 9) {
+            if (scrollPercentage > threshold && scrollPercentage < 100) {
                 elem.classList.add('is_showed');
-                return;
-                }
-
-                // 他のテキストは従来通りスクロールで表示
-                if (scrollingDown) {
-                if (scrollPercentage > threshold) {
-                    elem.classList.add('is_showed');
-                }
-                } else {
-                if (scrollPercentage <= threshold) {
-                    elem.classList.remove('is_showed');
-                }
-                }
+            } else {
+                elem.classList.remove('is_showed');
+            }
             });
 
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-            }
+            // 2つ目のビデオセクションのスクロール処理
+            const videoSection02Rect = videoSection02.getBoundingClientRect();
+            const scrollPercentage02 = (windowHeight - videoSection02Rect.top) / (videoSection02Rect.height + windowHeight) * 100;
 
-            window.addEventListener('scroll', checkScroll);
-            checkScroll(); // 初期表示時にもチェック
+            const cntTitle = document.querySelector('.cnt_title');
+            const cntForth = document.querySelector('.cnt_forth');
+            const cntFifth = document.querySelector('.cnt_fifth');
+
+            elements02.forEach((elem) => {
+                if (elem.classList.contains('cnt_title')) {
+                    if (scrollPercentage02 > 0 && scrollPercentage02 < 33) {
+                        elem.classList.add('is_showed');
+                    } else {
+                        elem.classList.remove('is_showed');
+                    }
+                } else if (elem.classList.contains('cnt_forth')) {
+                    if (scrollPercentage02 >= 33 && scrollPercentage02 < 66) {
+                        elem.classList.add('is_showed');
+                        // cnt_forthが表示される時にcnt_titleを消す
+                        cntTitle.classList.remove('is_showed');
+                    } else {
+                        elem.classList.remove('is_showed');
+                    }
+                } else if (elem.classList.contains('cnt_fifth')) {
+                    if (scrollPercentage02 >= 66 && scrollPercentage02 < 100) {
+                        elem.classList.add('is_showed');
+                        // cnt_fifthが表示される時にcnt_forthを消す
+                        cntForth.classList.remove('is_showed');
+                    } else {
+                        elem.classList.remove('is_showed');
+                    }
+                }
+            });
+        }
+
+        window.addEventListener('scroll', checkScroll);
+        window.addEventListener('resize', checkScroll);
+        checkScroll(); // 初期表示時にもチェック
         });
     </script>
   </body>
