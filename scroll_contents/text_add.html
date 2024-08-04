@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>スクロールに応じて動画・テキスト表出</title>
+    <style>
+      body, html, * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .video-section {
+        height: 300vh;
+        position: relative;
+      }
+
+      #scrolly-video {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        width: 100%;
+      }
+
+      .text-section {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 300vh;
+        pointer-events: none;
+      }
+
+      .target_contents {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .target_contents p {
+        font-size: 2rem;
+        color: #fff;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s, transform 0.5s;
+        margin-bottom: 1em;
+      }
+
+      .target_contents p.is_showed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* 仕様2と3のための新しいスタイル */
+      .cnt_forth, .cnt_fifth {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+      }
+
+      .cnt_forth {
+        top: 40%;
+      }
+
+      .cnt_fifth {
+        top: 60%;
+      }
+
+      .cnt_forth.is_showed, .cnt_fifth.is_showed {
+        opacity: 1;
+        transition: opacity 0.5s;
+        animation-name: textanime;/*keyname*/
+        animation-duration:5s;/*最大再生時間*/
+      }
+
+        @keyframes textanime {
+        0%{
+            opacity: 0;
+        }
+
+        100%{
+            opacity: 1;
+        }
+        }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="video-section">
+        <div id="scrolly-video"></div>
+        <div class="text-section">
+          <div class="target_contents">
+            <p class="cnt_first">first text</p>
+            <!-- <p class="cnt_second">second text second text second text second text<br />second text second</p>
+            <p class="cnt_third">third text third text third text third text third text third text third text third text</p> -->
+
+            <p class="cnt_forth">ぱっと1</p>
+            <p class="cnt_fifth">ぱっと2</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
+    <script>
+        let scrollyVideo;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            scrollyVideo = new ScrollyVideo({
+            scrollyVideoContainer: 'scrolly-video',
+            src: 'assets/movie/movie.mp4',
+            });
+
+            const videoSection = document.querySelector('.video-section');
+            const elements = document.querySelectorAll('.target_contents p');
+            let lastScrollTop = 0;
+
+            function checkScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollPercentage = (scrollTop / (videoSection.offsetHeight - window.innerHeight)) * 100;
+
+            const scrollingDown = scrollTop > lastScrollTop;
+
+            // 動画の現在時間を取得
+            const currentTime = scrollyVideo.video.currentTime;
+
+            elements.forEach((elem, index) => {
+                const threshold = index * 33;
+
+                // 仕様1: 4秒地点で最初の3つのテキストを消す
+                if (currentTime >= 4 && (elem.classList.contains('cnt_first') ||
+                    elem.classList.contains('cnt_second') ||
+                    elem.classList.contains('cnt_third'))) {
+                elem.classList.remove('is_showed');
+                return;
+                }
+
+                // 仕様2: cnt_forthを4秒地点で表示
+                if (elem.classList.contains('cnt_forth')) {
+                if (currentTime >= 4 && currentTime < 9) {
+                    elem.classList.add('is_showed');
+                } else {
+                    elem.classList.remove('is_showed');
+                }
+                return;
+                }
+
+                // 仕様3: cnt_fifthを9秒地点で表示
+                if (elem.classList.contains('cnt_fifth') && currentTime >= 9) {
+                elem.classList.add('is_showed');
+                return;
+                }
+
+                // 他のテキストは従来通りスクロールで表示
+                if (scrollingDown) {
+                if (scrollPercentage > threshold) {
+                    elem.classList.add('is_showed');
+                }
+                } else {
+                if (scrollPercentage <= threshold) {
+                    elem.classList.remove('is_showed');
+                }
+                }
+            });
+
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+            }
+
+            window.addEventListener('scroll', checkScroll);
+            checkScroll(); // 初期表示時にもチェック
+        });
+    </script>
+  </body>
+</html>
