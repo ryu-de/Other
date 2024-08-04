@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>スクロールに応じて動画・テキスト表出</title>
+    <style>
+        body,
+        html,
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .video-section {
+            height: 300vh;
+            position: relative;
+        }
+
+        #scrolly-video {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .text-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 300vh;
+            pointer-events: none;
+        }
+
+        .target_contents {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .target_contents p {
+            font-size: 2rem;
+            color: #fff;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+            margin-bottom: 1em;
+        }
+
+        .target_contents p.is_showed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cnt_second-child01,
+        .cnt_second-child02 {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .cnt_second-child01.is_showed,
+        .cnt_second-child02.is_showed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <section class="video-section">
+            <div id="scrolly-video"></div>
+            <div class="text-section">
+                <div class="target_contents">
+                    <p class="cnt_first">first text</p>
+                    <p class="cnt_second">
+                        <span class="cnt_second-child01">second text second text second text second text</span><br>
+                        <span class="cnt_second-child02">second text second</span>
+                    </p>
+                    <p class="cnt_third">third text third text third text third text third text third text third text
+                        third text</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
+    <script>
+        let scrollyVideo;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            scrollyVideo = new ScrollyVideo({
+                scrollyVideoContainer: 'scrolly-video',
+                src: 'assets/movie/movie.mp4',
+            });
+
+            const videoSection = document.querySelector('.video-section');
+            const cntFirst = document.querySelector('.cnt_first');
+            const cntSecond = document.querySelector('.cnt_second');
+            const cntSecondChild01 = document.querySelector('.cnt_second-child01');
+            const cntSecondChild02 = document.querySelector('.cnt_second-child02');
+            const cntThird = document.querySelector('.cnt_third');
+
+            let firstShowed = false;
+            let secondChild01Showed = false;
+            let secondChild02Showed = false;
+            let thirdShowed = false;
+
+            function checkScroll() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollPercentage = (scrollTop / (videoSection.offsetHeight - window.innerHeight)) * 100;
+                const videoTime = scrollyVideo.video.currentTime;
+
+                if (videoTime >= 1 && !firstShowed) {
+                    cntFirst.classList.add('is_showed');
+                    firstShowed = true;
+                }
+
+                if (videoTime >= 1.5 && !secondChild01Showed) {
+                    cntSecond.classList.add('is_showed');
+                    cntSecondChild01.classList.add('is_showed');
+                    secondChild01Showed = true;
+                    setTimeout(() => {
+                        cntSecondChild02.classList.add('is_showed');
+                        secondChild02Showed = true;
+                    }, 500);
+                }
+
+                if (videoTime >= 3 && !thirdShowed) {
+                    cntThird.classList.add('is_showed');
+                    thirdShowed = true;
+                }
+
+                if (videoTime < 1) {
+                    cntFirst.classList.remove('is_showed');
+                    firstShowed = false;
+                }
+
+                if (videoTime < 1.5) {
+                    cntSecond.classList.remove('is_showed');
+                    cntSecondChild01.classList.remove('is_showed');
+                    cntSecondChild02.classList.remove('is_showed');
+                    secondChild01Showed = false;
+                    secondChild02Showed = false;
+                }
+
+                if (videoTime < 10) {
+                    cntThird.classList.remove('is_showed');
+                    thirdShowed = false;
+                }
+            }
+
+            window.addEventListener('scroll', checkScroll);
+            scrollyVideo.video.addEventListener('timeupdate', checkScroll);
+            checkScroll(); // 初期表示時にもチェック
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>スクロールに応じて動画・テキスト表出</title>
+    <style>
+        body,
+        html,
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .video-section {
+            height: 300vh;
+            position: relative;
+        }
+
+        #scrolly-video,
+        #scrolly-video02 {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .text-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 300vh;
+            pointer-events: none;
+        }
+
+        .target_contents {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .target_contents p {
+            font-size: 2rem;
+            color: #fff;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+            margin-bottom: 1em;
+        }
+
+        .target_contents p.is_showed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cnt_second-child01,
+        .cnt_second-child02 {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .cnt_second-child01.is_showed,
+        .cnt_second-child02.is_showed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cnt_title {
+            transition: opacity 0.5s, transform 0.5s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .cnt_title.is_showed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cnt_title.hide {
+            display: none;
+            transition: none;
+        }
+
+        .cnt_forth,
+        .cnt_fifth {
+            transition: opacity 0.3s;
+            opacity: 0;
+            display: none;
+        }
+
+        .cnt_forth.is_showed,
+        .cnt_fifth.is_showed {
+            opacity: 1;
+            display: block;
+            animation-name: textanime;
+            /*keyname*/
+            animation-duration: 3s;
+            /*最大再生時間*/
+        }
+        @keyframes textanime {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <section class="video-section video-section01">
+            <div id="scrolly-video"></div>
+            <div class="text-section">
+                <div class="target_contents">
+                    <p class="cnt_first">first text</p>
+                    <p class="cnt_second">
+                        <span class="cnt_second-child01">second text second text second text second text</span><br>
+                        <span class="cnt_second-child02">second text second</span>
+                    </p>
+                    <p class="cnt_third">third text third text third text third text third text third text third text
+                        third text</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-section video-section02">
+            <div id="scrolly-video02"></div>
+            <div class="text-section">
+                <div class="target_contents">
+                    <p class="cnt_title">title</p>
+                    <p class="cnt_forth">ぱっと1</p>
+                    <p class="cnt_fifth">ぱっと2</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
+    <script>
+        let scrollyVideo, scrollyVideo02;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            scrollyVideo = new ScrollyVideo({
+                scrollyVideoContainer: 'scrolly-video',
+                src: 'assets/movie/movie.mp4',
+            });
+
+            scrollyVideo02 = new ScrollyVideo({
+                scrollyVideoContainer: 'scrolly-video02',
+                src: 'assets/movie/movie02.mp4',
+            });
+
+            const videoSection = document.querySelector('.video-section01');
+            const videoSection02 = document.querySelector('.video-section02');
+            const cntFirst = document.querySelector('.cnt_first');
+            const cntSecond = document.querySelector('.cnt_second');
+            const cntSecondChild01 = document.querySelector('.cnt_second-child01');
+            const cntSecondChild02 = document.querySelector('.cnt_second-child02');
+            const cntThird = document.querySelector('.cnt_third');
+            const cntTitle = document.querySelector('.cnt_title');
+            const cntForth = document.querySelector('.cnt_forth');
+            const cntFifth = document.querySelector('.cnt_fifth');
+
+            let firstShowed = false;
+            let secondChild01Showed = false;
+            let secondChild02Showed = false;
+            let thirdShowed = false;
+            let titleShowed = false;
+            let forthShowed = false;
+            let fifthShowed = false;
+
+            function checkScroll() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollPercentage = (scrollTop / (videoSection.offsetHeight - window.innerHeight)) * 100;
+                const videoTime = scrollyVideo.video.currentTime;
+                const video02Time = scrollyVideo02.video.currentTime;
+                const video02Duration = scrollyVideo02.video.duration;
+
+                if (videoTime >= 1 && !firstShowed) {
+                    cntFirst.classList.add('is_showed');
+                    firstShowed = true;
+                }
+
+                if (videoTime >= 1.2 && !secondChild01Showed) {
+                    cntSecond.classList.add('is_showed');
+                    cntSecondChild01.classList.add('is_showed');
+                    secondChild01Showed = true;
+                    setTimeout(() => {
+                        cntSecondChild02.classList.add('is_showed');
+                        secondChild02Showed = true;
+                    }, 500);
+                }
+
+                if (videoTime >= 3 && !thirdShowed) {
+                    cntThird.classList.add('is_showed');
+                    thirdShowed = true;
+                }
+
+                if (videoTime < 1) {
+                    cntFirst.classList.remove('is_showed');
+                    firstShowed = false;
+                }
+
+                if (videoTime < 1.2) {
+                    cntSecond.classList.remove('is_showed');
+                    cntSecondChild01.classList.remove('is_showed');
+                    cntSecondChild02.classList.remove('is_showed');
+                    secondChild01Showed = false;
+                    secondChild02Showed = false;
+                }
+
+                if (videoTime < 3) {
+                    cntThird.classList.remove('is_showed');
+                    thirdShowed = false;
+                }
+
+                // 新しい動画のロジック
+                if (video02Time >= 1 && video02Time < 4 && !titleShowed) {
+                    cntTitle.classList.remove('hide');
+                    setTimeout(() => {
+                        cntTitle.classList.add('is_showed');
+                    }, 0);
+                    titleShowed = true;
+                }
+
+                if (video02Time >= 4 && video02Time < 8 && !forthShowed) {
+                    cntTitle.classList.add('hide');
+                    cntTitle.classList.remove('is_showed');
+                    titleShowed = false;
+                    cntForth.classList.add('is_showed');
+                    forthShowed = true;
+                }
+
+                if (video02Time >= 8 && !fifthShowed) {
+                    cntForth.classList.remove('is_showed');
+                    forthShowed = false;
+                    cntFifth.classList.add('is_showed');
+                    fifthShowed = true;
+                }
+
+                if (video02Time >= video02Duration - 2 && fifthShowed) {
+                    cntFifth.classList.remove('is_showed');
+                    fifthShowed = false;
+                }
+
+                if (video02Time < 1) {
+                    cntTitle.classList.add('hide');
+                    cntTitle.classList.remove('is_showed');
+                    titleShowed = false;
+                }
+
+                if (video02Time < 4) {
+                    cntForth.classList.remove('is_showed');
+                    forthShowed = false;
+                }
+
+                if (video02Time < 8) {
+                    cntFifth.classList.remove('is_showed');
+                    fifthShowed = false;
+                }
+            }
+
+            window.addEventListener('scroll', checkScroll);
+            scrollyVideo.video.addEventListener('timeupdate', checkScroll);
+            scrollyVideo02.video.addEventListener('timeupdate', checkScroll);
+            checkScroll(); // 初期表示時にもチェック
+        });
+    </script>
+</body>
+
+</html>
