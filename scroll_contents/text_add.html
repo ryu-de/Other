@@ -94,6 +94,7 @@
     <main>
       <section class="video-section">
         <div id="scrolly-video"></div>
+        <div id="scrolly-video02"></div>
         <div class="text-section">
           <div class="target_contents">
             <p class="cnt_first">first text</p>
@@ -113,8 +114,13 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             scrollyVideo = new ScrollyVideo({
-            scrollyVideoContainer: 'scrolly-video',
-            src: 'assets/movie/movie.mp4',
+                scrollyVideoContainer: 'scrolly-video',
+                src: 'assets/movie/movie.mp4',
+            });
+
+            scrollyVideo02 = new ScrollyVideo({
+                scrollyVideoContainer: 'scrolly-video02',
+                src: 'assets/movie/movie02.mp4',  // 2つ目の動画のパスを指定
             });
 
             const videoSection = document.querySelector('.video-section');
